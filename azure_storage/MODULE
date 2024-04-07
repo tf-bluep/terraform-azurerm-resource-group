@@ -1,0 +1,6 @@
+{
+  "name": "azure_storage",
+  "provider": "azurerm",
+  "features": {},
+  "version": "1.0.7"
+}
