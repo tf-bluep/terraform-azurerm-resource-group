@@ -1,0 +1,5 @@
+{
+  "name": "azure_resourcegroup",
+  "provider": "azurerm",
+  "version": "1.0.0"
+}

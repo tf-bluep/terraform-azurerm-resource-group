@@ -1,0 +1,6 @@
+* @6eAutomation/6eAutomation-Owner
+
+*.tf @6eAutomation/6eAutomation-Reviewers
+.github/workflows/* @6eAutomation/6eAutomation-Owner
+*/MODULE @6eAutomation/6eAutomation-Reviewers
+*/CHANGELOG.md @6eAutomation/6eAutomation-Reviewers

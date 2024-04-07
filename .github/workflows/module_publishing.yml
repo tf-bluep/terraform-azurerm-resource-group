@@ -1,0 +1,151 @@
+---
+name: module_publishing
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read # Required for git checkout
+
+jobs:
+  modules-changed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: get_changed_files
+        run: |
+          DIFF_TARGET=$([[ "${{ github.ref }}" = "refs/heads/main" ]] && echo "HEAD~1" || echo "origin/main")
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR ${DIFF_TARGET} | xargs)
+          echo "$CHANGED_FILES"
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+      - name: Get changed modules
+        id: get_changed_modules
+        run: |
+          DIFF_TARGET=$([[ "${{ github.ref }}" = "refs/heads/main" ]] && echo "HEAD~1" || echo "origin/main")
+          CHANGED_MODULES=$(git diff --name-only --diff-filter=ACMR ${DIFF_TARGET} | grep -v ".tftpl" | grep ".tf\|MODULE" | xargs dirname | sort | uniq | xargs)
+          echo "$CHANGED_MODULES"
+          echo "modules=$CHANGED_MODULES" >> $GITHUB_OUTPUT
+    outputs:
+      files: ${{ steps.get_changed_files.outputs.files }}
+      modules: ${{ steps.get_changed_modules.outputs.modules }}
+
+  versions-updated:
+    needs: modules-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Check each changed module also has their version updated
+        id: check
+        run: |
+          CHANGED_FILES=$(echo "${{ needs.modules-changed.outputs.files }}" | xargs -n 1)
+          CHANGED_MODULES=$(echo "${{ needs.modules-changed.outputs.modules }}" | xargs -n 1)
+
+          EXIT_CODE=0
+          MODULES_WITH_NO_VERSION_UPDATE=()
+
+          for MODULE in ${CHANGED_MODULES}; do
+              if [[ ! "${CHANGED_FILES}" =~ "${MODULE}/MODULE" ]]; then
+                  echo "Module not updated: $MODULE"
+                  MODULES_WITH_NO_VERSION_UPDATE+=(${MODULE})
+                  EXIT_CODE=1
+              fi
+          done
+
+          echo "modules=${MODULES_WITH_NO_VERSION_UPDATE[@]}" >> $GITHUB_OUTPUT
+          echo "::error title=Module version needs updating::${MODULES_WITH_NO_VERSION_UPDATE[@]}"
+
+          exit ${EXIT_CODE}
+    outputs:
+      modules: ${{ steps.check.outputs.modules }}
+
+  changelog-updated:
+    needs: modules-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Check each changed module also has their changelog updated
+        id: check
+        run: |
+          CHANGED_FILES=$(echo "${{ needs.modules-changed.outputs.files }}" | xargs -n 1)
+          CHANGED_MODULES=$(echo "${{ needs.modules-changed.outputs.modules }}" | xargs -n 1)
+
+          EXIT_CODE=0
+          MODULES_WITH_NO_CHANGELOG_UPDATE=()
+
+          for MODULE in ${CHANGED_MODULES}; do
+              if [[ ! "${CHANGED_FILES}" =~ "${MODULE}/CHANGELOG.md" ]]; then
+                  echo "Module not updated: $MODULE"
+                  MODULES_WITH_NO_CHANGELOG_UPDATE+=(${MODULE})
+                  EXIT_CODE=1
+              fi
+          done
+
+          echo "modules=${MODULES_WITH_NO_CHANGELOG_UPDATE[@]}" >> $GITHUB_OUTPUT
+          echo "::error title=Module changelog needs updating::${MODULES_WITH_NO_CHANGELOG_UPDATE[@]}"
+
+          exit ${EXIT_CODE}
+    outputs:
+      modules: ${{ steps.check.outputs.modules }}
+
+  build-module-metadata:
+    needs: modules-changed
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && needs.modules-changed.outputs.modules != '' }}
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - id: set-matrix
+        run: |
+          METADATA=$(find ${{ needs.modules-changed.outputs.modules }} -name MODULE | xargs cat | jq --slurp --compact-output)
+          echo "$METADATA"
+          if [[ "$METADATA" != "[]" ]]
+          then
+            echo "matrix={\"include\":$METADATA}" >> $GITHUB_OUTPUT
+          else
+            echo "No modules changed, so no metadata"
+          fi
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  register-and-publish-module:
+    needs: build-module-metadata
+    runs-on: ubuntu-latest
+    if: ${{ needs.build-module-metadata.outputs.matrix != '' }}
+    strategy:
+      matrix: ${{ fromJson(needs.build-module-metadata.outputs.matrix) }}
+    steps:
+      - uses: dcarbone/tfcloud-module-register-action@v0.2.0
+        with:
+          token: ${{ secrets.TFCLOUD_API_KEY }}
+          organization: rohityad
+          namespace: rohityad
+          module-name: ${{ matrix.name }}
+          provider-name: ${{ matrix.provider }}
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Create artifact
+        id: artifact
+        run: |
+          ARTIFACT_PATH=$([[ "${{ matrix.path }}" != "" ]] && echo "${{ matrix.path }}" || echo "${{ matrix.name }}")
+          ARTIFACT_FILE="$(pwd)/${{ matrix.name }}-${{ matrix.version }}.tar.gz"
+          tar -zcvf "${ARTIFACT_FILE}" -C ${ARTIFACT_PATH} .
+          echo "artifact_filepath=${ARTIFACT_FILE}" >> $GITHUB_OUTPUT
+      - name: Publish module
+        if: ${{ success() }}
+        uses: dcarbone/tfcloud-module-push-action@v0.2.0
+        with:
+          artifact-file: ${{ steps.artifact.outputs.artifact_filepath }}
+          token: ${{ secrets.TFCLOUD_API_KEY }}
+          organization: rohityad
+          namespace: rohityad
+          module-name: ${{ matrix.name }}
+          provider-name: ${{ matrix.provider }}
+          version: ${{ matrix.version }}

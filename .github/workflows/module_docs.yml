@@ -1,0 +1,125 @@
+---
+name: module_docs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Generate HTML docs
+        run: |
+          MODULE_JSON=$(find . -name MODULE | sort | xargs cat | jq --slurp --compact-output)
+
+          TEMPLATE=$(cat <<EOF
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <meta http-equiv="X-UA-Compatible" content="ie=edge">
+              <title>Terraform Modules - BLUEP</title>
+              <style>
+                * {
+                  font-family: sans-serif;
+                }
+
+                p {
+                  text-align: center;
+                }
+
+                table {
+                  margin: 0 auto;
+                  color: #333;
+                  background: white;
+                  border: 1px solid grey;
+                  font-size: 12pt;
+                  border-collapse: collapse;
+                }
+                table thead th {
+                  color: #777;
+                  background: rgba(0,0,0,.1);
+                }
+                table th,
+                table td {
+                  padding: .5em;
+                  border: 1px solid lightgrey;
+                }
+                table tbody tr:nth-of-type(odd) {
+                  background: rgba(0,0,0,.05);
+                }
+              </style>
+            </head>
+            <body>
+              <p>Click on a module link to view additional information (variables/outputs)</p>
+              <table></table>
+            </body>
+            <script>
+              let table = document.querySelector("table");
+              let headers = ["Module", "Source", "Latest version"];
+              let data=${MODULE_JSON};
+
+              for (let element of data) {
+                let row = table.insertRow();
+                let cell, text;
+
+                // Module
+                cell = row.insertCell();
+                text = document.createTextNode(element["name"]);
+                let moduleLink = document.createElement("a");
+                moduleLink.href = \https://github.com/tf-bluep/tf-shared/tree/main/\${element["name"]}\`;
+                moduleLink.appendChild(text);
+                cell.appendChild(moduleLink);
+
+                // Source
+                cell = row.insertCell();
+                text = document.createTextNode(\`app.terraform.io/Bluepi/\${element["name"]}/\${element["provider"]}\`);
+                cell.appendChild(text);
+
+                // Version
+                cell = row.insertCell();
+                text = document.createTextNode(element["version"]);
+                let changelogLink = document.createElement("a");
+                changelogLink.href = \`https://github.com/tf-bluep/tf-shared/tree/main/\${element["name"]}/CHANGELOG.md\`;
+                changelogLink.appendChild(text);
+                cell.appendChild(changelogLink);
+              }
+
+              let thead = table.createTHead();
+              let row = thead.insertRow();
+              for (let key of headers) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
+            </script>
+          </html>
+          EOF)
+
+          mkdir docs
+          printf "$TEMPLATE" > docs/index.html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: "docs/"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

@@ -1,0 +1,44 @@
+---
+name: terraform
+on:
+  pull_request:
+
+env:
+  TF_CLI_ARGS_fmt: -diff=true -check=true
+  TF_TOKEN_app_terraform_io: ${{ secrets.TFCLOUD_API_KEY }}
+permissions:
+  contents: read # Required for git checkout
+
+jobs:
+  check:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Get changed files
+        id: get_changed_files
+        run: |
+          DIFF_TARGET=$([[ "${{ github.ref }}" = "refs/heads/main" ]] && echo "HEAD~1" || echo "origin/main")
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR ${DIFF_TARGET} | xargs)
+          echo "$CHANGED_FILES"
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+      - name: Precommit checks
+        shell: bash
+        run: |
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/bin/terraform-docs
+
+          pip install pre-commit
+          pre-commit run --files ${{ steps.get_changed_files.outputs.files }}
