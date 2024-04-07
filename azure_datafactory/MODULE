@@ -1,5 +1,5 @@
 {
   "name": "azure_datafactory",
   "provider": "azurerm",
-  "version": "1.0.25"
+  "version": "1.0.0"
 }

@@ -8,5 +8,4 @@ resource "azurerm_resource_group" "this" {
     "Environment"       = var.env
     "Cost Center"       = var.costcenter
   }
-  
 }
