@@ -1,3 +1,4 @@
+/*
 provider "azurerm" {
   subscription_id = "f2fb6ada-1520-4d1a-a23b-8ebbcf63a24c"
   features {}
@@ -31,4 +32,4 @@ resource "azurerm_virtual_network_peering" "hub-to-this-network" {
   allow_forwarded_traffic      = true
   provider                     = azurerm.hub-network
 
-}
+}*/
