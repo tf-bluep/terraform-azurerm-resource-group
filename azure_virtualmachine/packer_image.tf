@@ -1,6 +1,6 @@
 provider "azurerm" {
   alias           = "shared-image"
-  subscription_id = "5611c1d2-d56c-491e-8ba7-9f804d0e3c76"
+  subscription_id = "f2fb6ada-1520-4d1a-a23b-8ebbcf63a24c"
   features {}
 }
 
