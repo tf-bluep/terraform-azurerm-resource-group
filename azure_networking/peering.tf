@@ -1,5 +1,5 @@
 provider "azurerm" {
-  subscription_id = "f6941c4a-91a7-4b3e-90a6-7686644be380"
+  subscription_id = "f2fb6ada-1520-4d1a-a23b-8ebbcf63a24c"
   features {}
   alias = "hub-network"
 }
@@ -17,7 +17,7 @@ resource "azurerm_virtual_network_peering" "this-to-hub-network" {
   name                         = "Peering-vNET-${var.department}-${var.project}-${var.env}-MZ_IGA-AZ-PNQ-HUBVNET"
   resource_group_name          = azurerm_resource_group.this.name
   virtual_network_name         = azurerm_virtual_network.this.name
-  remote_virtual_network_id    = "/subscriptions/f6941c4a-91a7-4b3e-90a6-7686644be380/resourceGroups/iga-az-pnq-rg/providers/Microsoft.Network/virtualNetworks/iga-az-pnq-hubvnet"
+  remote_virtual_network_id    = "/subscriptions/f2fb6ada-1520-4d1a-a23b-8ebbcf63a24c/resourceGroups/iga-az-pnq-rg/providers/Microsoft.Network/virtualNetworks/iga-az-pnq-hubvnet"
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }
