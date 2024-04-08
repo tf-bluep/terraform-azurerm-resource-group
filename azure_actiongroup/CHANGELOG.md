@@ -7,3 +7,5 @@ All changes to this project will be recorded in this document
 ## 1.0.0 - 2024-04-08
 
 Creating new Module for Action group
+
+## 1.0.1 - 2024-04-08
