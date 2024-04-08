@@ -27,5 +27,5 @@ resource "azurerm_virtual_network" "this" {
 
 resource "azurerm_virtual_network_dns_servers" "this" {
   virtual_network_id = azurerm_virtual_network.this.id
-  dns_servers        = ["10.141.16.11", "10.141.16.12"]
+  dns_servers        = ["10.0.0.4", "10.0.0.5"]
 }

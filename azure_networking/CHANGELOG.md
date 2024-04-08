@@ -11,3 +11,5 @@ All changes to this project will be recorded in this document
 ## 1.0.30 - 2024-04-08
 
 ## 1.0.31 - 2024-04-08
+
+## 1.0.32 - 2024-04-08
