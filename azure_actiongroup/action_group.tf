@@ -14,4 +14,3 @@ resource "azurerm_monitor_action_group" "this" {
     "Environment"       = var.env
     "Cost Center"       = var.costcenter
   }
-}

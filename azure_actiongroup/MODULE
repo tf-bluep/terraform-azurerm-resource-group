@@ -1,5 +1,5 @@
 {
-  "name": "azure_action_group",
+  "name": "azure_actiongroup",
   "provider": "azurerm",
   "features": {},
   "version": "1.0.0"

@@ -40,4 +40,3 @@ variable "env" {
 variable "costcenter" {
   type = string
 }
-
