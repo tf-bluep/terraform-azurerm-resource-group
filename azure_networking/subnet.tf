@@ -7,4 +7,18 @@ resource "azurerm_subnet" "this" {
   service_endpoints    = ["Microsoft.Storage", "Microsoft.Sql", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.EventHub", "Microsoft.AzureActiveDirectory"]
 
   depends_on = [azurerm_virtual_network.this]
+
+  dynamic "validation" {
+    for_each = azurerm_virtual_network.this.address_space
+    content {
+      valid = can(cidrsubnet(validation.value, 8, 0), each.value)
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      address_prefixes,
+    ]
+  }
 }
+
