@@ -2,5 +2,5 @@
   "name": "azure_virtualmachine",
   "provider": "azurerm",
   "features": {},
-  "version": "1.0.1"
+  "version": "1.0.33"
 }
