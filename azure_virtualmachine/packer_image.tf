@@ -1,6 +1,7 @@
 provider "azurerm" {
   alias           = "shared-image"
   subscription_id = "f2fb6ada-1520-4d1a-a23b-8ebbcf63a24c"
+  tenant_id       = "23e4ff6d-7f45-4d40-8565-6135271fcd0c"
   features {}
 }
 
