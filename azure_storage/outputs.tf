@@ -1,24 +1,72 @@
+output "storage_account_properties" {
+  description = "Created Storage Account properties."
+  value       = azurerm_storage_account.storage
+}
+
 output "storage_account_id" {
-  value = azurerm_storage_account.this.id
+  description = "Created Storage Account ID."
+  value       = azurerm_storage_account.storage.id
 }
 
-output "storage_name" {
-  value = azurerm_storage_account.this.name
+output "storage_account_name" {
+  description = "Created Storage Account name."
+  value       = azurerm_storage_account.storage.name
 }
 
-output "storage_endpoint" {
-  value = azurerm_storage_account.this.primary_blob_endpoint
+output "storage_account_identity" {
+  description = "Created Storage Account identity block."
+  value       = azurerm_storage_account.storage.identity
 }
 
-output "storage_host" {
-  value = azurerm_storage_account.this.primary_blob_host
+output "storage_account_network_rules" {
+  description = "Network rules of the associated Storage Account."
+  value = try(
+    one(azurerm_storage_account_network_rules.network_rules[*].enabled),
+    azurerm_storage_account.storage.network_rules[0],
+  )
 }
 
-output "storage_account_adls_gen2_url" {
-  value = azurerm_storage_account.this.primary_dfs_host
+output "storage_blob_containers" {
+  description = "Created blob containers in the Storage Account."
+  value       = azurerm_storage_container.container
+}
+
+output "storage_file_shares" {
+  description = "Created file shares in the Storage Account."
+  value       = azurerm_storage_share.share
+}
+
+output "storage_file_tables" {
+  description = "Created tables in the Storage Account."
+  value       = azurerm_storage_table.table
+}
+
+output "storage_file_queues" {
+  description = "Created queues in the Storage Account."
+  value       = azurerm_storage_queue.queue
+}
+
+output "primary_blob_endpoint" {
+  value = azurerm_storage_account.storage.primary_blob_endpoint
+}
+
+output "primary_blob_host" {
+  value = azurerm_storage_account.storage.primary_blob_host
+}
+
+output "primary_dfs_host" {
+  value = azurerm_storage_account.storage.primary_dfs_host
 }
 
 
 output "storage_account_key" {
-  value = azurerm_storage_account.this.primary_access_key
+  value = azurerm_storage_account.storage.primary_access_key
+}
+
+output "primary_blob_microsoft_endpoint" {
+  value = azurerm_storage_account.storage.primary_blob_microsoft_endpoint
+}
+
+output "primary_blob_microsoft_host" {
+  value = azurerm_storage_account.storage.primary_blob_microsoft_host
 }
