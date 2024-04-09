@@ -12,6 +12,7 @@ Creating new Module for Azure Storage
 
 Enabled Shared Access
 
+
 ## 1.0.2 - 2024-02-16
 
 Added Outputs
@@ -35,7 +36,3 @@ Public Access Disabled - Removed Key Vault
 ## 1.0.7 - 2024-03-14
 
 Added Output for storage access key
-
-## 1.0.8 - 2024-03-14
-
-Fix Storage
