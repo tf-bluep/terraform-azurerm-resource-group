@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Get changed files
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Check each changed module also has their version updated
         id: check
         run: |
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Check each changed module also has their changelog updated
         id: check
         run: |
@@ -130,7 +130,7 @@ jobs:
           module-name: ${{ matrix.name }}
           provider-name: ${{ matrix.provider }}
       - name: Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Create artifact
         id: artifact
         run: |
