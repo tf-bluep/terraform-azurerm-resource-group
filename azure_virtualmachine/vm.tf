@@ -19,6 +19,12 @@ resource "azurerm_windows_virtual_machine" "this" {
     "Environment"       = var.env
     "Cost Center"       = var.costcenter
   }
+    storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
   network_interface_ids = [
     azurerm_network_interface.this.id
   ]
@@ -28,14 +34,14 @@ resource "azurerm_windows_virtual_machine" "this" {
     storage_account_type = var.os_disk_type
     disk_size_gb         = var.os_disk_size
   }
-  source_image_id = var.OS == "2016" ? data.azurerm_shared_image_version.image_2016.id : var.OS == "2019" ? data.azurerm_shared_image_version.image_2019.id : var.OS == "2022" ? data.azurerm_shared_image_version.image_2022.id : var.OS
-  boot_diagnostics {
-    storage_account_uri = ""
-  }
-  lifecycle {
-    ignore_changes = [source_image_id]
-  }
-}
+  #source_image_id = var.OS == "2016" ? data.azurerm_shared_image_version.image_2016.id : var.OS == "2019" ? data.azurerm_shared_image_version.image_2019.id : var.OS == "2022" ? data.azurerm_shared_image_version.image_2022.id : var.OS
+  #boot_diagnostics {
+   # storage_account_uri = ""
+  #}
+  #lifecycle {
+   # ignore_changes = [source_image_id]
+  #}
+#}
 
 
 #### Virtual Machine Extensions for custom script to be run post provisioning
