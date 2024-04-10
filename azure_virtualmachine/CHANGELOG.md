@@ -13,3 +13,5 @@ Creating new Module for Azure Virtual Machine
 ## 1.0.34 - 2024-04-08
 
 ## 1.0.35 - 2024-04-08
+
+## 1.0.36 - 2024-04-08
