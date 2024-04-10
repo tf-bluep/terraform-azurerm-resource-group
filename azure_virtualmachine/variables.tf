@@ -41,9 +41,9 @@ variable "size" {
   type = string
 }
 
-variable "OS" {
-  type = string
-}
+#variable "OS" {
+ # type = string
+#}
 
 variable "domain" {
   type    = string
