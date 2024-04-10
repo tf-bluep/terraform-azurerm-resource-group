@@ -1,6 +1,3 @@
-data "azurerm_client_config" "current" {
-}
-
 variable "action_group_name" {
   description = "Name of the storage account"
   type        = string
