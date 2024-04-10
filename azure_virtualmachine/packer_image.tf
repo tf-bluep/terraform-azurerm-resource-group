@@ -11,12 +11,7 @@
  # resource_group_name = "RG-ADMIN-OS-Repository"
  # provider            = azurerm.shared-image
 #}
-  storage_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-datacenter"
-    version   = "latest"
-  }
+ 
 #data "azurerm_shared_image_version" "image_2019" {
  # name                = "latest"
   #image_name          = "Win2019"
