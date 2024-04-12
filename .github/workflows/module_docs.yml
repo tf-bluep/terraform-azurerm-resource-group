@@ -12,7 +12,7 @@ jobs:
       contents: read
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Generate HTML docs
         run: |
           MODULE_JSON=$(find . -name MODULE | sort | xargs cat | jq --slurp --compact-output)
@@ -122,4 +122,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v2
